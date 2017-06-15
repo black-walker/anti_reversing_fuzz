@@ -1,7 +1,7 @@
 import random
 import os
 
-os.system("cp license_2 license_2_fuzz")
+os.system("cp orig orig_fuzz")
 
 def flip_byte(in_bytes):
 	i = random.randint(0,len(in_bytes))
@@ -9,7 +9,7 @@ def flip_byte(in_bytes):
 	return in_bytes[:i]+c+in_bytes[i+1:]
 
 def copy_binary():
-	with open("license_2", "rb") as orig_f, open("license_2_fuzz", "wb") as new_f:
+	with open("orig", "rb") as orig_f, open("orig_fuzz", "wb") as new_f:
 		new_f.write(flip_byte(orig_f.read()))
 
 def compare(fn1, fn2):
@@ -17,16 +17,16 @@ def compare(fn1, fn2):
 		return f1.read()==f2.read()
 
 def check_output():
-	os.system("(./license_2_fuzz ; ./license_2_fuzz AAAA-Z10N-42-OK) > fuzz_output")
+	os.system("(./orig ; ./orig_fuzz AAAA-Z10N-42-OK) > fuzz_output")
 	return compare("orig_output", "fuzz_output")
 
 
 def check_gdb():
-	os.system("echo disassemble main | gdb license_2_fuzz > fuzz_gdb")
+	os.system("echo disassemble main | gdb orig_fuzz > fuzz_gdb")
 	return compare("orig_gdb", "fuzz_gdb")
 
 def check_radare():
-	os.system('echo -e "aaa\ns sym.main\npdf" | radare2 license_2_fuzz > fuzz_radare')
+	os.system('echo -e "aaa\ns sym.main\npdf" | radare2 orig_fuzz > fuzz_radare')
 	return compare("orig_radare", "fuzz_radare")
 
 while True:
